@@ -103,6 +103,42 @@
             </div>
             <button type="submit" class="btn btn-primary">log in</button>
           </form>
+          <div class="info">
+            <span class="signup"
+              >Don't have an acconunt ? <a href="#">sign up</a>
+            </span>
+            <span class="sso"><a href="#">login via SSO</a></span>
+          </div>
+          <div class="companies">
+            <h5>Trusted by the top companies</h5>
+            <ul>
+              <li>
+                <img src="../assets/lyft-full-logo.dae8f3d6.svg" alt="" />
+              </li>
+              <li>
+                <img
+                  src="../assets/buzzfeed-full-logo.2833d9f1.svg"
+                  alt="buzzfeed"
+                />
+              </li>
+              <li>
+                <img src="../assets/asana-full-logo.9ae9c7da.svg" alt="asana" />
+              </li>
+              <li>
+                <img
+                  src="../assets/one-plus-logo.c52c0338.svg"
+                  alt="oneplus"
+                  style="width: 106px"
+                />
+              </li>
+              <li>
+                <img
+                  src="../assets/house-party-logo.e67b3abc.svg"
+                  alt="houseparty"
+                />
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
@@ -117,7 +153,7 @@ export default {
 <style lang="scss">
 .view {
   background-color: #00287a;
-  height: 100vh;
+  height: 100%;
   padding-bottom: 30px;
 
   .carousel {
@@ -145,7 +181,7 @@ export default {
 }
 
 .login {
-  margin: 12% auto;
+  margin: 15% auto;
   width: 60%;
   h4 {
     color: #495466;
@@ -186,15 +222,55 @@ export default {
       background: #fff;
       padding: 0 0.5rem;
       color: #495466;
-      font-weight: 700;
+    }
+  }
+  .info {
+    font-size: 13px;
+    a {
+      text-decoration: none;
+    }
+    .signup {
+      float: left;
+    }
+    span {
+      float: right;
     }
   }
   form {
     label {
       float: left;
+      margin-bottom: 0.5rem;
+      font-size: 13px;
+      font-weight: bold;
+      color: #465266;
     }
     span {
       float: right;
+      font-size: 13px;
+      color: #a1a7b2;
+      font-weight: bold;
+    }
+    button {
+      width: 100%;
+      background-color: #0089e5;
+      font-weight: bolder;
+    }
+  }
+  .companies {
+    margin-top: 31px;
+    color: #999999;
+
+    h5 {
+      font-size: 17px;
+    }
+    ul {
+      display: flex;
+      padding-left: 0;
+      flex-wrap: wrap;
+      justify-content: space-around;
+      align-items: center;
+      list-style: none;
+      gap: 0.6rem;
     }
   }
 }
