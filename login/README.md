@@ -22,3 +22,6 @@ npm run lint
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
+
+
+    "@fortawesome/vue-fontawesome": "^3.0.2",

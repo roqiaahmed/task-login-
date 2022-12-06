@@ -64,13 +64,16 @@
           <h4>Log in to Instabug</h4>
           <div class="d-grid gap-3 brands">
             <button class="btn btn-primary google" type="button">
-              <span> <fa :icon="['fab', 'google']" /> </span>google
+              <!-- <span><fa :icon="['fab', 'google']" /> </span> -->
+              google
             </button>
             <button class="btn btn-primary github" type="button">
-              <span> <fa :icon="['fab', 'github']" /> </span>github
+              <!-- <span> <fa :icon="['fab', 'github']" /> </span> -->
+              github
             </button>
             <button class="btn btn-primary microsoft" type="button">
-              <span> <fa :icon="['fab', 'microsoft']" /> </span>microsoft
+              <!-- <span> <fa :icon="['fab', 'microsoft']" /> </span> -->
+              microsoft
             </button>
           </div>
           <div class="divider">
@@ -84,10 +87,15 @@
               <input
                 type="email"
                 class="form-control"
+                :class="[v$.email.$error ? 'fildinput' : '']"
                 id="exampleInputEmail1"
                 placeholder="you@company.com"
                 aria-describedby="emailHelp"
+                v-model="state.email"
               />
+              <div class="error" v-if="v$.email.$error">
+                {{ v$.email.$errors[0].$message }}
+              </div>
             </div>
             <div class="mb-3">
               <label for="exampleInputPassword1" class="form-label"
@@ -95,13 +103,31 @@
               >
               <span>Forget password? </span>
               <input
+                v-model="state.password"
                 type="password"
                 class="form-control"
+                :class="[v$.password.$error ? 'fildinput' : '']"
                 placeholder="6+ Characters"
                 id="exampleInputPassword1"
               />
+              <div class="error" v-if="v$.password.$error">
+                {{ v$.password.$errors[0].$message }}
+              </div>
             </div>
-            <button type="submit" class="btn btn-primary">log in</button>
+            <button
+              type="submit"
+              class="btn btn-primary"
+              @click.prevent="signupnow()"
+              @click="newUser"
+              :disabled="
+                v$.password.$error ||
+                v$.email.$error ||
+                !state.email ||
+                !state.password
+              "
+            >
+              log in
+            </button>
           </form>
           <div class="info">
             <span class="signup"
@@ -146,10 +172,66 @@
 </template>
 
 <script>
+import { db } from "../firebase/index";
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { email, required, minLength } from "@vuelidate/validators";
+import { useVuelidate } from "@vuelidate/core";
+import { ref, reactive, computed } from "vue";
+import { useRouter } from "vue-router";
+
 export default {
   name: "HomeView",
+
+  setup() {
+    const router = useRouter();
+    const user = ref();
+    const auth = getAuth();
+
+    const state = reactive({
+      email: "",
+      password: "",
+    });
+    const newUser = () => {
+      createUserWithEmailAndPassword(auth, state.email, state.password).then(
+        (userCredential) => {
+          // Signed in
+          const user = userCredential.user;
+          console.log("user", user);
+          router.push({ path: "/about" });
+          // ...
+        }
+      );
+    };
+    const rules = computed(() => {
+      return {
+        email: { required, email },
+        password: { required, minLength: minLength(6) },
+      };
+    });
+
+    const v$ = useVuelidate(rules, state);
+    const signupnow = () => {
+      v$.value.$touch();
+      if (!v$.value.$error) {
+        console.log("pass");
+      } else {
+        console.log("error");
+      }
+    };
+
+    return {
+      state,
+      db,
+      auth,
+      newUser,
+      signupnow,
+      v$,
+      user,
+    };
+  },
 };
 </script>
+
 <style lang="scss">
 .view {
   background-color: #00287a;
@@ -183,9 +265,11 @@ export default {
 .login {
   margin: 15% auto;
   width: 60%;
+
   h4 {
     color: #495466;
   }
+
   .brands {
     margin: auto;
     color: #fff;
@@ -195,23 +279,27 @@ export default {
       border: none;
       font-weight: bold;
     }
+
     .github {
       background-color: #000000;
       border: none;
       font-weight: bold;
     }
+
     .microsoft {
       background-color: #aaa;
       color: #000000;
       border: none;
       font-weight: bold;
     }
+
     span {
       float: left;
       margin-left: 15px;
       color: #fff;
     }
   }
+
   .divider {
     background-color: #cdcccd;
     height: 0.5px;
@@ -224,19 +312,33 @@ export default {
       color: #495466;
     }
   }
+
   .info {
     font-size: 13px;
+
     a {
       text-decoration: none;
     }
+
     .signup {
       float: left;
     }
+
     span {
       float: right;
     }
   }
+
   form {
+    .fildinput {
+      border: #f00 1px solid;
+    }
+
+    .error {
+      font-size: 16px;
+      color: #f00;
+    }
+
     label {
       float: left;
       margin-bottom: 0.5rem;
@@ -244,18 +346,21 @@ export default {
       font-weight: bold;
       color: #465266;
     }
+
     span {
       float: right;
       font-size: 13px;
       color: #a1a7b2;
       font-weight: bold;
     }
+
     button {
       width: 100%;
       background-color: #0089e5;
       font-weight: bolder;
     }
   }
+
   .companies {
     margin-top: 31px;
     color: #999999;
@@ -263,6 +368,7 @@ export default {
     h5 {
       font-size: 17px;
     }
+
     ul {
       display: flex;
       padding-left: 0;
