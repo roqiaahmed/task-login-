@@ -80,6 +80,11 @@
             <span>OR</span>
           </div>
           <form>
+            <div class="md-3">
+              <div class="error-message" :class="{ errorr: erroor }">
+                <p>Your email and/or password are incorrect</p>
+              </div>
+            </div>
             <div class="mb-3">
               <label for="exampleInputEmail1" class="form-label"
                 >Work Email</label
@@ -173,7 +178,7 @@
 
 <script>
 import { db } from "../firebase/index";
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { email, required, minLength } from "@vuelidate/validators";
 import { useVuelidate } from "@vuelidate/core";
 import { ref, reactive, computed } from "vue";
@@ -181,26 +186,33 @@ import { useRouter } from "vue-router";
 
 export default {
   name: "HomeView",
-
   setup() {
     const router = useRouter();
     const user = ref();
     const auth = getAuth();
-
+    const erroor = ref(true);
+    console.log(erroor);
     const state = reactive({
       email: "",
       password: "",
     });
     const newUser = () => {
-      createUserWithEmailAndPassword(auth, state.email, state.password).then(
-        (userCredential) => {
+      signInWithEmailAndPassword(auth, state.email, state.password)
+        .then((userCredential) => {
           // Signed in
           const user = userCredential.user;
           console.log("user", user);
           router.push({ path: "/about" });
           // ...
-        }
-      );
+        })
+        .catch((error) => {
+          // const errorCode = error.code;
+          const errorMessage = error.message;
+          // erroor.value.push(errorMessage);
+          erroor.value = false;
+          console.log(erroor);
+          console.log("error", errorMessage);
+        });
     };
     const rules = computed(() => {
       return {
@@ -213,13 +225,14 @@ export default {
     const signupnow = () => {
       v$.value.$touch();
       if (!v$.value.$error) {
-        console.log("pass");
+        return;
       } else {
         console.log("error");
       }
     };
 
     return {
+      erroor,
       state,
       db,
       auth,
@@ -330,6 +343,21 @@ export default {
   }
 
   form {
+    .errorr {
+      display: none;
+    }
+    .error-message {
+      // display: none;
+      background: #fce6e2;
+      color: #606778;
+      text-align: start;
+      height: 2.5rem;
+      padding: 0.5rem;
+      border-radius: 4px;
+      border: 1px solid rgba(0, 0, 0, 0.25);
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
     .fildinput {
       border: #f00 1px solid;
     }
